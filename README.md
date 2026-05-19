@@ -32,7 +32,9 @@ Org-wide alert listing typically requires **organization owner** or **security m
 
 ## Installation
 
-Replace `OWNER/REPO` with this repository (for example `yu-iskw/claude-code-plugin-template`) and clone if you install from a local path:
+**Clone + local install:** clone this repository, `cd` into it, and use filesystem paths with `--from-local` (do not pass `OWNER/REPO` on those commands).
+
+**Remote install:** replace `OWNER/REPO` with this repository (for example `yu-iskw/github-security-report-plugin`).
 
 ```bash
 git clone https://github.com/OWNER/REPO.git
@@ -43,10 +45,10 @@ cd REPO
 
 Best when your host does not load full plugins, or you want selected skills in a project.
 
-Install **all skills** from `github-security-report` into the current repo (project scope):
+Install **all skills** from `github-security-report` into the current repo (project scope). Run from the **repository root** after clone:
 
 ```bash
-gh skill install OWNER/REPO --from-local \
+gh skill install ./plugins/github-security-report --from-local \
   --agent cursor \
   --scope project \
   --allow-hidden-dirs
@@ -71,11 +73,13 @@ Use `--agent` for your host:
 
 Use `--scope user` to install under your home directory instead of the project.
 
-Remote install (no clone):
+Remote install (no clone). The second argument is the **path inside the repository** to the skill directory:
 
 ```bash
-gh skill install OWNER/REPO skills/fetch-dependabot-alerts --agent gemini-cli
+gh skill install OWNER/REPO plugins/github-security-report/skills/fetch-dependabot-alerts --agent gemini-cli
 ```
+
+**All skills remotely:** run `gh skill install OWNER/REPO` and use the interactive picker, or repeat install with each path under `plugins/github-security-report/skills/<skill-name>/`.
 
 See [`gh skill install`](https://cli.github.com/manual/gh_skill_install) for pins, versions, and updates (`gh skill update`).
 
