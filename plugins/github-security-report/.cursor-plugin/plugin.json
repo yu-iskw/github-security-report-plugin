@@ -1,0 +1,10 @@
+{
+  "name": "github-security-report",
+  "version": "0.1.0",
+  "description": "Org-agnostic primitive skills and orchestrator for GitHub organization and repository security alerts via gh api.",
+  "author": {
+    "name": "yu-iskw"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/yu-iskw/claude-code-plugin-template"
+}

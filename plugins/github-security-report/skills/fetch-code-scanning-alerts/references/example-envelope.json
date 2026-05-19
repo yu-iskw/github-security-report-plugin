@@ -1,0 +1,14 @@
+{
+  "source": "code_scanning",
+  "org": "acme-corp",
+  "scope": "org",
+  "state": "open",
+  "fetched_at": "2026-01-15T12:00:00Z",
+  "summary": {
+    "total": 1,
+    "by_severity": { "high": 1 }
+  },
+  "top_repos": [{ "repo": "acme-corp/web-app", "count": 1 }],
+  "alerts": [],
+  "errors": []
+}

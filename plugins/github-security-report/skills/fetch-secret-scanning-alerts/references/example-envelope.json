@@ -1,0 +1,14 @@
+{
+  "source": "secret_scanning",
+  "org": "acme-corp",
+  "scope": "org",
+  "state": "open",
+  "fetched_at": "2026-01-15T12:00:00Z",
+  "summary": {
+    "total": 0,
+    "by_severity": {}
+  },
+  "top_repos": [],
+  "alerts": [],
+  "errors": []
+}
