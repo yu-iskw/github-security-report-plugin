@@ -18,7 +18,7 @@ if ! auth_json="$(gh auth status --json hosts 2>&1)"; then
 	exit 0
 fi
 
-account="$(jq -r '.hosts["github.com"][] | select(.active == true) | .login' <<<"${auth_json}" | head -1)"
+account="$(jq -r '.hosts["github.com"][] | select(.active == true) | (.user // .login // empty)' <<<"${auth_json}" | head -1)"
 scopes_csv="$(jq -r '.hosts["github.com"][] | select(.active == true) | .scopes' <<<"${auth_json}" | head -1)"
 scopes_json="$(printf '%s' "${scopes_csv}" | tr ',' '\n' | sed 's/^ *//' | jq -R . | jq -s .)"
 
