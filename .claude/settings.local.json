@@ -1,5 +1,25 @@
 {
   "permissions": {
-    "allow": ["Bash(make lint:*)", "Bash(trunk check:*)", "Bash(bash:*)"]
+    "allow": [
+      "Bash(make lint:*)",
+      "Bash(trunk check:*)",
+      "Bash(bash:*)",
+      "Bash(gh api:*)",
+      "Bash(gh auth:*)",
+      "Bash(jq:*)",
+      "Bash(plugins/github-security-report/scripts/*:*)",
+      "Bash(plugins/github-security-report/skills/*/scripts/*:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "github-security-report@claude-plugin-template": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugin-template": {
+      "source": {
+        "source": "directory",
+        "path": "."
+      }
+    }
   }
 }
