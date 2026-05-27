@@ -12,10 +12,10 @@
     ]
   },
   "enabledPlugins": {
-    "github-security-report@claude-plugin-template": true
+    "github-security-report@github-security-report-plugin": true
   },
   "extraKnownMarketplaces": {
-    "claude-plugin-template": {
+    "github-security-report-plugin": {
       "source": {
         "source": "directory",
         "path": "."

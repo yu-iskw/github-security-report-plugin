@@ -1,8 +1,8 @@
-# AI Plugin Monorepo — GitHub Security Report
+# GitHub Security Report plugin
 
 This repository ships the **[`github-security-report`](plugins/github-security-report/)** plugin for AI coding assistants: **agent skills**, a **sub-agent** orchestrator, and optional hooks/MCP. It provides org-agnostic GitHub security alerting via the [`gh`](https://cli.github.com/) CLI.
 
-Works with **Claude Code**, **Cursor**, **Codex**, **GitHub Copilot**, and **Gemini CLI** (installation steps differ slightly per host).
+Works with **Claude Code**, **Cursor**, **Codex**, **GitHub Copilot**, and **Gemini CLI** (installation steps differ slightly per host). The repo is a small monorepo: marketplace manifests at the root and the plugin under `plugins/github-security-report/` (see [Repository layout](#repository-layout)).
 
 ## Prerequisites
 
@@ -32,29 +32,39 @@ Org-wide alert listing typically requires **organization owner** or **security m
 
 ## Installation
 
-**Clone + local install:** clone this repository, `cd` into it, and use filesystem paths with `--from-local` (do not pass `OWNER/REPO` on those commands).
+### Identifiers
 
-**Remote install:** replace `OWNER/REPO` with this repository (for example `yu-iskw/github-security-report-plugin`).
+| Term           | Value                                                  |
+| -------------- | ------------------------------------------------------ |
+| GitHub repo    | `yu-iskw/github-security-report-plugin`                |
+| Marketplace ID | `github-security-report-plugin`                        |
+| Plugin ID      | `github-security-report`                               |
+| Install target | `github-security-report@github-security-report-plugin` |
+
+**Claude Code scopes** (`-s`): `project` (shared via `.claude/settings.json`), `user` (all your projects), `local` (you only, this repository).
+
+**Clone (optional):** for local paths, clone and `cd` into the repo. Use `--from-local` with `gh skill install` and do not pass `OWNER/REPO` on those commands.
 
 ```bash
-git clone https://github.com/OWNER/REPO.git
-cd REPO
+git clone https://github.com/yu-iskw/github-security-report-plugin.git
+cd github-security-report-plugin
 ```
 
 ### Option A — Install skills only (`gh skill install`)
 
 Best when your host does not load full plugins, or you want selected skills in a project.
 
-Install **all skills** from `github-security-report` into the current repo (project scope). Run from the **repository root** after clone:
+**Local — all skills** (from repository root after clone):
 
 ```bash
 gh skill install ./plugins/github-security-report --from-local \
   --agent cursor \
-  --scope project \
-  --allow-hidden-dirs
+  --scope project
 ```
 
-Or install **one skill** by path (faster on large repos):
+Add `--allow-hidden-dirs` only if you install from paths under hidden directories (for example `.claude/skills/`).
+
+**Local — one skill** (faster on large repos):
 
 ```bash
 gh skill install ./plugins/github-security-report/skills/fetch-dependabot-alerts \
@@ -73,13 +83,15 @@ Use `--agent` for your host:
 
 Use `--scope user` to install under your home directory instead of the project.
 
-Remote install (no clone). The second argument is the **path inside the repository** to the skill directory:
+**Remote — one skill** (no clone). The second argument is the path inside the repository:
 
 ```bash
-gh skill install OWNER/REPO plugins/github-security-report/skills/fetch-dependabot-alerts --agent gemini-cli
+gh skill install yu-iskw/github-security-report-plugin \
+  plugins/github-security-report/skills/fetch-dependabot-alerts \
+  --agent codex --scope project
 ```
 
-**All skills remotely:** run `gh skill install OWNER/REPO` and use the interactive picker, or repeat install with each path under `plugins/github-security-report/skills/<skill-name>/`.
+**All skills remotely:** run `gh skill install yu-iskw/github-security-report-plugin` and use the interactive picker, or repeat install with each path under `plugins/github-security-report/skills/<skill-name>/`.
 
 See [`gh skill install`](https://cli.github.com/manual/gh_skill_install) for pins, versions, and updates (`gh skill update`).
 
@@ -87,14 +99,33 @@ See [`gh skill install`](https://cli.github.com/manual/gh_skill_install) for pin
 
 Installs skills **and** sub-agents from the marketplace manifest.
 
+#### Remote (no clone)
+
 ```bash
-# From the repository root
-claude plugin marketplace add "$(pwd)"
-claude plugin install -s project github-security-report@claude-plugin-template
+claude plugin marketplace add yu-iskw/github-security-report-plugin
+claude plugin install -s project github-security-report@github-security-report-plugin
+# In chat: /reload-plugins
 claude plugin list
 ```
 
-If marketplace add fails, try pointing at `.claude-plugin`:
+#### Local checkout (repository root)
+
+```bash
+claude plugin marketplace add "$(pwd)"
+claude plugin install -s project github-security-report@github-security-report-plugin
+# In chat: /reload-plugins
+claude plugin list
+```
+
+**UI:** run `/plugin` → Discover → install `github-security-report` from marketplace `github-security-report-plugin`.
+
+**Dev without installing:** load the plugin for one session:
+
+```bash
+claude --plugin-dir ./plugins/github-security-report
+```
+
+If marketplace add fails, point at the manifest directory:
 
 ```bash
 claude plugin marketplace add ./.claude-plugin
@@ -102,47 +133,75 @@ claude plugin marketplace add ./.claude-plugin
 
 Use `-s user` to install for your user instead of the project.
 
-#### Local testing (Claude Code)
+#### Contributors (auto-load in this repo)
 
-This repository commits [`.claude/settings.local.json`](.claude/settings.local.json) so Claude Code loads the in-repo marketplace and enables the plugin automatically:
+[`.claude/settings.local.json`](.claude/settings.local.json) registers the in-repo marketplace and enables the plugin:
 
-- Marketplace: `claude-plugin-template` (directory source: repo root)
-- Plugin: `github-security-report@claude-plugin-template`
-
-**Steps:**
+- Marketplace: `github-security-report-plugin` (directory source: repo root)
+- Plugin: `github-security-report@github-security-report-plugin`
 
 1. Open this repository in Claude Code.
 2. Restart Claude Code or reload the window after pulling changes.
-3. Verify: run `/plugin` in chat or `claude plugin list` — you should see `github-security-report`.
+3. Verify: `/plugin` in chat or `claude plugin list` — you should see `github-security-report`.
 4. Smoke test: ask the agent to use `security-report-orchestrator` for an organization you can access (for example `acme-corp`).
 
-If the marketplace does not load from settings, use the CLI fallback:
+**CLI fallback** if settings do not load the marketplace:
 
 ```bash
 claude plugin marketplace add "$(pwd)"
-claude plugin install -s local github-security-report@claude-plugin-template
+claude plugin install -s local github-security-report@github-security-report-plugin
+/reload-plugins
 ```
 
 ### Option C — Full plugin (Cursor)
 
-**From a local checkout** (fastest for development):
+**Local checkout** (fastest for development):
 
 ```bash
 mkdir -p ~/.cursor/plugins/local
 ln -sf "$(pwd)/plugins/github-security-report" ~/.cursor/plugins/local/github-security-report
 ```
 
-Restart Cursor or run **Developer: Reload Window**. Components are discovered from `.cursor-plugin/plugin.json` and default folders (`skills/`, `agents/`, etc.).
+Run **Developer: Reload Window** (or restart Cursor). Components are discovered from `.cursor-plugin/plugin.json` and default folders (`skills/`, `agents/`, etc.).
 
-**From a team marketplace** (Teams / Enterprise): admins import this GitHub repo under **Dashboard → Settings → Plugins → Team Marketplaces**. Developers install plugins from the marketplace panel in Cursor. See [Cursor plugin docs](https://cursor.com/docs/plugins).
+**In-editor:** use the marketplace panel or `/add-plugin`. See [Cursor plugin docs](https://cursor.com/docs/plugins).
 
-**Monorepo marketplace:** this repo includes [`.cursor-plugin/marketplace.json`](.cursor-plugin/marketplace.json) listing all plugins under `plugins/`.
+**Team marketplace** (Teams / Enterprise): admins import this GitHub repo under **Dashboard → Settings → Plugins → Team Marketplaces**. Developers install from the marketplace panel.
+
+**Monorepo catalog:** [`.cursor-plugin/marketplace.json`](.cursor-plugin/marketplace.json) (`github-security-report-plugin`) lists plugins under `plugins/`.
 
 ### Option D — Codex
 
-If your Codex build supports plugins, use the manifest at [`.codex-plugin/marketplace.json`](.codex-plugin/marketplace.json) the same way as your Codex documentation describes for marketplace plugins.
+Codex discovers marketplace catalogs at [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (legacy-compatible) or `.agents/plugins/marketplace.json`. This repo provides `.claude-plugin/` at the root; [`.codex-plugin/marketplace.json`](.codex-plugin/marketplace.json) mirrors the same catalog for packaging validation, not Codex auto-discovery.
 
-Otherwise install skills with Option A and `--agent codex` (skills land in the agent-specific directory, often `.agents/skills` at project scope).
+**Remote:**
+
+```bash
+codex plugin marketplace add yu-iskw/github-security-report-plugin
+```
+
+**Local:**
+
+```bash
+codex plugin marketplace add .
+```
+
+Then open Codex → `/plugins` → marketplace `github-security-report-plugin` → install `github-security-report`.
+
+**Fallback:** Option A with `--agent codex` (skills often land in `.agents/skills` at project scope).
+
+### Migration (Claude Code)
+
+If you previously used marketplace `claude-plugin-template`:
+
+```bash
+claude plugin marketplace remove claude-plugin-template
+claude plugin marketplace add yu-iskw/github-security-report-plugin
+claude plugin install -s project github-security-report@github-security-report-plugin
+/reload-plugins
+```
+
+Update personal `enabledPlugins` keys to `github-security-report@github-security-report-plugin` if you pinned the old `@claude-plugin-template` suffix.
 
 ### Option E — GitHub Copilot
 
