@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to this template.
+Thanks for contributing to this repository.
 
 ## Development Prerequisites
 
